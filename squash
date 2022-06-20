@@ -1,0 +1,5 @@
+#!/bin/bash
+#sudo rm deploy/Transportant-lite/root.squashfs
+#sudo mksquashfs work/Transportant/stage2/rootfs deploy/Transportant-lite/root.squashfs -comp xz -noappend
+sudo rm /data/images/20220602/root.squashfs
+sudo mksquashfs  deploy/Transportant-lite/temp /data/images/20220602/root.squashfs -comp xz -noappend
