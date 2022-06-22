@@ -5,3 +5,7 @@ touch stage4/SKIP
 touch stage4/SKIP_IMAGE
 touch stage5/SKIP
 touch stage5/SKIP_IMAGE
+
+rm stage2/EXPORT_NOOBS
+rm stage4/EXPORT_NOOBS
+rm stage5/EXPORT_NOOBS
