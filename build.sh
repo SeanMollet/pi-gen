@@ -309,6 +309,7 @@ mkdir -p "${WORK_DIR}"
 log "Begin ${BASE_DIR}"
 
 STAGE_LIST=${STAGE_LIST:-${BASE_DIR}/stage*}
+EXPORT_STAGE_DIR=${EXPORT_STAGE_DIR:-export-image}
 
 for STAGE_DIR in $STAGE_LIST; do
 	STAGE_DIR=$(realpath "${STAGE_DIR}")
@@ -317,7 +318,7 @@ done
 
 CLEAN=1
 for EXPORT_DIR in ${EXPORT_DIRS}; do
-	STAGE_DIR=${BASE_DIR}/export-image
+	STAGE_DIR=${BASE_DIR}/${EXPORT_STAGE_DIR}
 	# shellcheck source=/dev/null
 	source "${EXPORT_DIR}/EXPORT_IMAGE"
 	EXPORT_ROOTFS_DIR=${WORK_DIR}/$(basename "${EXPORT_DIR}")/rootfs
@@ -326,8 +327,8 @@ for EXPORT_DIR in ${EXPORT_DIRS}; do
 		EXPORT_NAME="${IMG_FILENAME}${IMG_SUFFIX}"
 		echo "------------------------------------------------------------------------"
 		echo "Running export stage for ${EXPORT_NAME}"
-		rm -f "${WORK_DIR}/export-image/${EXPORT_NAME}.img" || true
-		rm -f "${WORK_DIR}/export-image/${EXPORT_NAME}.qcow2" || true
+		rm -f "${WORK_DIR}/${EXPORT_STAGE_DIR}/${EXPORT_NAME}.img" || true
+		rm -f "${WORK_DIR}/${EXPORT_STAGE_DIR}/${EXPORT_NAME}.qcow2" || true
 		rm -f "${WORK_DIR}/${EXPORT_NAME}.img" || true
 		rm -f "${WORK_DIR}/${EXPORT_NAME}.qcow2" || true
 		EXPORT_STAGE=$(basename "${EXPORT_DIR}")
@@ -375,10 +376,10 @@ for EXPORT_DIR in ${EXPORT_DIRS}; do
 		done
 		popd > /dev/null
 
-		mkdir -p "${WORK_DIR}/export-image/rootfs"
-		mv "${WORK_DIR}/${EXPORT_NAME}.qcow2" "${WORK_DIR}/export-image/"
-		echo "Mounting image ${WORK_DIR}/export-image/${EXPORT_NAME}.qcow2 to rootfs ${WORK_DIR}/export-image/rootfs"
-		mount_qimage "${WORK_DIR}/export-image/${EXPORT_NAME}.qcow2" "${WORK_DIR}/export-image/rootfs"
+		mkdir -p "${WORK_DIR}/${EXPORT_STAGE_DIR}/rootfs"
+		mv "${WORK_DIR}/${EXPORT_NAME}.qcow2" "${WORK_DIR}/${EXPORT_STAGE_DIR}/"
+		echo "Mounting image ${WORK_DIR}/${EXPORT_STAGE_DIR}/${EXPORT_NAME}.qcow2 to rootfs ${WORK_DIR}/${EXPORT_STAGE_DIR}/rootfs"
+		mount_qimage "${WORK_DIR}/${EXPORT_STAGE_DIR}/${EXPORT_NAME}.qcow2" "${WORK_DIR}/${EXPORT_STAGE_DIR}/rootfs"
 
 		CLEAN=0
 		run_stage
