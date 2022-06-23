@@ -358,7 +358,9 @@ for EXPORT_DIR in ${EXPORT_DIRS}; do
 		rm -f "${WORK_DIR}/${EXPORT_NAME}.qcow2" || true
 		EXPORT_STAGE=$(basename "${EXPORT_DIR}")
 		for s in $STAGE_LIST; do
-			TMP_LIST=${TMP_LIST:+$TMP_LIST }$(basename "${s}")
+			if [ ! -f "${s}/SKIP" ]; then 
+				TMP_LIST=${TMP_LIST:+$TMP_LIST }$(basename "${s}")
+			fi
 		done
 		FIRST_STAGE=${TMP_LIST%% *}
 		FIRST_IMAGE="image-${FIRST_STAGE}.qcow2"
