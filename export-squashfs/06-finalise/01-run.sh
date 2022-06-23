@@ -12,6 +12,12 @@ if hash hardlink 2>/dev/null; then
 fi
 EOF
 
+#this won't work on a squashFs anyway
+on_chroot << EOF
+apt remove -y dphys-swapfile
+EOF
+
+
 if [ -d "${ROOTFS_DIR}/home/${FIRST_USER_NAME}/.config" ]; then
 	chmod 700 "${ROOTFS_DIR}/home/${FIRST_USER_NAME}/.config"
 fi
