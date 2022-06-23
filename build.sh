@@ -103,9 +103,11 @@ run_stage(){
 	if [ -f ${SUM_FILE} ]; then
 		if [ "$(< $SUM_FILE)" == "${CURRENT_SUM}" ] && [ "${CHANGE_FORCES_BUILD}" == "False" ]; then
     		log "${STAGE_DIR} has not changed, skipping"
-			PREV_STAGE="${STAGE}"
-			PREV_STAGE_DIR="${STAGE_DIR}"
-			PREV_ROOTFS_DIR="${ROOTFS_DIR}"
+			if [ ! -f SKIP ]; then
+				PREV_STAGE="${STAGE}"
+				PREV_STAGE_DIR="${STAGE_DIR}"
+				PREV_ROOTFS_DIR="${ROOTFS_DIR}"
+			fi
 			popd > /dev/null
 			return 0
 		fi
@@ -150,6 +152,9 @@ run_stage(){
 				run_sub_stage
 			fi
 		done
+		PREV_STAGE="${STAGE}"
+		PREV_STAGE_DIR="${STAGE_DIR}"
+		PREV_ROOTFS_DIR="${ROOTFS_DIR}"
 	fi
 
 	if [ "${USE_QCOW2}" = "1" ]; then
@@ -161,9 +166,6 @@ run_stage(){
 		fi
 	fi
 
-	PREV_STAGE="${STAGE}"
-	PREV_STAGE_DIR="${STAGE_DIR}"
-	PREV_ROOTFS_DIR="${ROOTFS_DIR}"
 	popd > /dev/null
 	log "End ${STAGE_DIR}"
 	printf "%s" "$CURRENT_SUM" > "$SUM_FILE"
