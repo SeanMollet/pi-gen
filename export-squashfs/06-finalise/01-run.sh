@@ -91,7 +91,10 @@ umount ${ROOTFS_DIR}/dev/pts || true
 umount ${ROOTFS_DIR}/dev || true
 
 mksquashfs ${ROOTFS_DIR} "${DEPLOY_DIR}/${IMG_FILENAME}${IMG_SUFFIX}.squashfs" -comp xz
-ln -sf  "${DEPLOY_DIR}/${IMG_FILENAME}${IMG_SUFFIX}.squashfs"  "${DEPLOY_DIR}/latest_root.squashfs"
+
+pushd "${DEPLOY_DIR}" > /dev/null
+ln -sf  "${IMG_FILENAME}${IMG_SUFFIX}.squashfs"  "latest_root.squashfs"
+popd > /dev/null
 
 if [ "${USE_QCOW2}" = "0" ] && [ "${NO_PRERUN_QCOW2}" = "0" ]; then
 	ROOT_DEV="$(mount | grep "${ROOTFS_DIR} " | cut -f1 -d' ')"
