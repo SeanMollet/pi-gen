@@ -96,6 +96,19 @@ run_stage(){
 
 	pushd "${STAGE_DIR}" > /dev/null
 
+	#If there is no change in the stage folder, don't run it
+	#As soon as we run one, subsequent stages need to run
+	CURRENT_SUM=$(find ./ -type f -print0 | sort -z | xargs -0 sha256sum | sha256sum)
+	SUM_FILE=${WORK_DIR}/${STAGE}.sha256sum
+	if [ -f ${SUM_FILE} ]; then
+		if [ "$(< $SUM_FILE)" == "${CURRENT_SUM}" ] && [ "${CHANGE_FORCES_BUILD}" == "False" ]; then
+    		log "${STAGE_DIR} has not changed, skipping"
+			popd > /dev/null
+			return 0
+		fi
+	fi
+	CHANGE_FORCES_BUILD="True"
+
 	STAGE_WORK_DIR="${WORK_DIR}/${STAGE}"
 	ROOTFS_DIR="${STAGE_WORK_DIR}"/rootfs
 
@@ -112,7 +125,10 @@ run_stage(){
 
 	if [ ! -f SKIP_IMAGES ]; then
 		if [ -f "${STAGE_DIR}/EXPORT_IMAGE" ]; then
+			log "Staging ${STAGE_DIR} for Image Export"
 			EXPORT_DIRS="${EXPORT_DIRS} ${STAGE_DIR}"
+		else
+			log "Not staging ${STAGE_DIR} for Image Export"
 		fi
 	fi
 	if [ ! -f SKIP ]; then
@@ -147,6 +163,7 @@ run_stage(){
 	PREV_ROOTFS_DIR="${ROOTFS_DIR}"
 	popd > /dev/null
 	log "End ${STAGE_DIR}"
+	printf "%s" "$CURRENT_SUM" > "$SUM_FILE"
 }
 
 if [ "$(id -u)" != "0" ]; then
@@ -184,6 +201,7 @@ do
 done
 
 term() {
+	log "Term called"
 	if [ "${USE_QCOW2}" = "1" ]; then
 		log "Unloading image"
 		unload_qimage
@@ -264,6 +282,8 @@ export QUILT_PATCHES
 export QUILT_NO_DIFF_INDEX=1
 export QUILT_NO_DIFF_TIMESTAMPS=1
 export QUILT_REFRESH_ARGS="-p ab"
+
+export CHANGE_FORCES_BUILD="False"
 
 # shellcheck source=scripts/common
 source "${SCRIPT_DIR}/common"
