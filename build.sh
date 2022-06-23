@@ -103,6 +103,9 @@ run_stage(){
 	if [ -f ${SUM_FILE} ]; then
 		if [ "$(< $SUM_FILE)" == "${CURRENT_SUM}" ] && [ "${CHANGE_FORCES_BUILD}" == "False" ]; then
     		log "${STAGE_DIR} has not changed, skipping"
+			PREV_STAGE="${STAGE}"
+			PREV_STAGE_DIR="${STAGE_DIR}"
+			PREV_ROOTFS_DIR="${ROOTFS_DIR}"
 			popd > /dev/null
 			return 0
 		fi
